@@ -254,7 +254,7 @@
 
 <header class="nav">
   <div class="nav-inner">
-    <div class="logo">SHAREY KAPRI PORTFOLIO</div>
+    <div class="logo">SHAREY KAPRI PORTFOLIO </div>
     <nav class="links" id="navLinks">
       <a href="#about">About</a>
       <a href="#skills">Skills</a>
@@ -407,7 +407,7 @@
     <h2 class="reveal">Things I've actually built.</h2>
     <div class="proj-grid">
 
-    <div class="proj-card reveal">
+        <div class="proj-card reveal">
         <div class="proj-top">
           <div class="proj-tag">Live Build · Personal</div>
           <h3>Portfolio Website — Girish Sharma</h3>
@@ -482,7 +482,6 @@
           <p><b>Outcome:</b> Faster iteration on every project above — this portfolio included.</p>
         </div></div>
       </div>
-
     </div>
   </div>
 </section>
@@ -507,13 +506,17 @@
       <div class="eyebrow">Contact</div>
       <h2>Let's build something.</h2>
       <p style="margin-bottom:28px;">Have a role in mind, or want to see more of my work? Send a message — it opens directly in your email client, addressed to me.</p>
-      <form id="contactForm">
-        <div class="field"><label for="cf-name">Name</label><input id="cf-name" type="text" required></div>
-        <div class="field"><label for="cf-email">Your email</label><input id="cf-email" type="email" required></div>
-        <div class="field"><label for="cf-msg">Message</label><textarea id="cf-msg" rows="5" required></textarea></div>
-        <button type="submit" class="submit-btn">Send message →</button>
-        <div class="form-note">Opens your email app, addressed to shareykapri@gmail.com</div>
+      <form id="contactForm" target="hiddenFrame" action="https://api.web3forms.com/submit" method="POST">
+        <input type="hidden" name="access_key" value="09c0898d-5860-4918-8858-24b3fe91b34f">
+        <input type="hidden" name="subject" value="New message from your portfolio site">
+        <input type="hidden" name="from_name" value="Portfolio Contact Form">
+        <div class="field"><label for="cf-name">Name</label><input id="cf-name" name="name" type="text" required></div>
+        <div class="field"><label for="cf-email">Your email</label><input id="cf-email" name="email" type="email" required></div>
+        <div class="field"><label for="cf-msg">Message</label><textarea id="cf-msg" name="message" rows="5" required></textarea></div>
+        <button type="submit" class="submit-btn" id="submitBtn">Send message →</button>
+        <div class="form-note" id="formNote">Submissions are emailed directly to shareykapri@gmail.com</div>
       </form>
+      <iframe name="hiddenFrame" style="display:none;" title="form-submit-target"></iframe>
     </div>
     <div class="contact-info reveal">
       <div class="eyebrow">Reach me directly</div>
@@ -523,14 +526,14 @@
       <div class="ci-row"><span class="k">LinkedIn</span><a href="https://www.linkedin.com/in/sharey-kapri-20632a255" target="_blank" rel="noopener">sharey-kapri-20632a255</a></div>
       <div class="ci-row"><span class="k">Location</span><span>Butibori, Nagpur, Maharashtra, India</span></div>
       <div style="margin-top:28px;">
-        <a href="Sharey Kapri.pdf" download class="btn btn-ghost">⬇ Download resume (PDF)</a>
+        <a href="Sharey Kapri.pdf" download class="btn btn-ghost">⬇ Download résumé (PDF)</a>
       </div>
     </div>
   </div>
 </section>
 
 <footer>
-  © 2026 Sharey Kapri (FrontEnd Web Develper) · shareykapri@gmail.com
+  © 2026 Sharey Kapri (FrontEnd Developer) · shareykapri@gmail.com
 </footer>
 
 <script>
@@ -566,15 +569,29 @@
     btn.firstChild.textContent = card.classList.contains('open') ? 'Hide case study ' : 'View case study ';
   }
 
-  // contact form -> mailto
-  document.getElementById('contactForm').addEventListener('submit', function(e){
-    e.preventDefault();
-    const name = document.getElementById('cf-name').value;
-    const email = document.getElementById('cf-email').value;
-    const msg = document.getElementById('cf-msg').value;
-    const subject = encodeURIComponent('Portfolio inquiry from ' + name);
-    const body = encodeURIComponent(msg + '\n\n— ' + name + ' (' + email + ')');
-    window.location.href = 'mailto:shareykapri@gmail.com?subject=' + subject + '&body=' + body;
+  // contact form -> Web3Forms (native POST to hidden iframe, so it works from file:// and any host)
+  const contactForm = document.getElementById('contactForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const formNote = document.getElementById('formNote');
+  let submitting = false;
+  contactForm.addEventListener('submit', function(){
+    if(submitting) return;
+    submitting = true;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+    formNote.textContent = 'Sending your message…';
+    formNote.style.color = 'var(--slate)';
+    // form posts natively to the hidden iframe; we can't read cross-origin response,
+    // so we optimistically confirm after a short delay (Web3Forms responds in ~1-2s)
+    setTimeout(() => {
+      contactForm.reset();
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Sent ✓';
+      formNote.textContent = 'Thanks! Your message has been sent — Sharey will get back to you soon.';
+      formNote.style.color = 'var(--teal)';
+      submitting = false;
+      setTimeout(() => { submitBtn.textContent = 'Send message →'; }, 3000);
+    }, 1800);
   });
 
   // scroll reveal
